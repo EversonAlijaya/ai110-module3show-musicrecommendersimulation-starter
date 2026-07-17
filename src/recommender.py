@@ -1,3 +1,4 @@
+"""Music Recommender Simulation: load songs, score them against a user profile, and rank the top matches."""
 import csv
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
