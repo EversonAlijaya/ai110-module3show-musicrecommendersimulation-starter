@@ -63,13 +63,42 @@ def load_songs(csv_path: str) -> List[Dict]:
     return songs
 
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
-    """
-    Scores a single song against user preferences.
-    Required by recommend_songs() and src/main.py
-    """
-    # TODO: Implement scoring logic using your Algorithm Recipe from Phase 2.
-    # Expected return format: (score, reasons)
-    return []
+    """Score one song against a user profile, returning (score, reasons) using the Algorithm Recipe."""
+    score = 0.0
+    reasons: List[str] = []
+
+    # Categorical exact-match bonuses.
+    if user_prefs.get("favorite_genre") == song["genre"]:
+        score += 2.5
+        reasons.append(f"genre match: {song['genre']} (+2.5)")
+    if user_prefs.get("favorite_mood") == song["mood"]:
+        score += 2.0
+        reasons.append(f"mood match: {song['mood']} (+2.0)")
+
+    # Numeric closeness on the 0 to 1 features: reward small distance to the target.
+    numeric_features = [
+        ("target_energy", "energy", 1.5),
+        ("target_valence", "valence", 1.5),
+        ("target_danceability", "danceability", 1.0),
+        ("target_acousticness", "acousticness", 1.0),
+    ]
+    for pref_key, song_key, weight in numeric_features:
+        target = user_prefs.get(pref_key)
+        if target is not None:
+            similarity = max(0.0, 1 - abs(song[song_key] - target))
+            points = weight * similarity
+            score += points
+            reasons.append(f"{song_key} similarity: +{points:.2f}")
+
+    # Tempo closeness, normalized by 100 BPM so it cannot swamp the other features.
+    target_tempo = user_prefs.get("target_tempo_bpm")
+    if target_tempo is not None:
+        similarity = max(0.0, 1 - abs(song["tempo_bpm"] - target_tempo) / 100)
+        points = 1.0 * similarity
+        score += points
+        reasons.append(f"tempo similarity: +{points:.2f}")
+
+    return score, reasons
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
     """
