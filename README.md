@@ -151,18 +151,34 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Sample Recommendation Output
 
-Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
+Running `python -m src.main` with the High-Energy Pop Lover profile
+(`favorite_genre=pop`, `favorite_mood=happy`, `target_energy=0.85`) produces:
 
 ```
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
-# Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
-```
+Loaded songs: 20
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
+Top recommendations:
+
+1. Sunrise City by Neon Echo  [pop / happy]
+   Score: 10.29
+   Reasons: genre match: pop (+2.5), mood match: happy (+2.0), energy similarity: +1.46, valence similarity: +1.44, danceability similarity: +0.99, acousticness similarity: +0.97, tempo similarity: +0.93
+
+2. Gym Hero by Max Pulse  [pop / intense]
+   Score: 8.09
+   Reasons: genre match: pop (+2.5), energy similarity: +1.38, valence similarity: +1.46, danceability similarity: +0.92, acousticness similarity: +0.90, tempo similarity: +0.93
+
+3. Rooftop Lights by Indigo Parade  [indie pop / happy]
+   Score: 7.62
+   Reasons: mood match: happy (+2.0), energy similarity: +1.36, valence similarity: +1.48, danceability similarity: +0.98, acousticness similarity: +0.80, tempo similarity: +0.99
+
+4. Bass Cathedral by Deep Sector  [house / energetic]
+   Score: 5.54
+   Reasons: energy similarity: +1.46, valence similarity: +1.29, danceability similarity: +0.88, acousticness similarity: +0.93, tempo similarity: +0.99
+
+5. Neon Pulse by Voltage  [edm / energetic]
+   Score: 5.48
+   Reasons: energy similarity: +1.35, valence similarity: +1.38, danceability similarity: +0.90, acousticness similarity: +0.88, tempo similarity: +0.97
+```
 
 ---
 
