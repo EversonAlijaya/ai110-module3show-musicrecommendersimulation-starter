@@ -38,40 +38,79 @@ Each `Song` uses the attributes from `data/songs.csv`:
 - `id`, `title`, `artist`: identity and display (not used in scoring)
 - `genre`, `mood`: categorical labels (e.g. `lofi`, `chill`)
 - `energy`, `valence`, `danceability`, `acousticness`: numeric audio features on a 0 to 1 scale
-- `tempo_bpm`: tempo in beats per minute (roughly 60 to 152)
+- `tempo_bpm`: tempo in beats per minute (roughly 60 to 160)
+
+The catalog has 20 songs spanning 17 genres and 13 moods.
 
 ### UserProfile
 
-The `UserProfile` stores the user's preferred values for the same features, meaning
-the taste we score against:
+The user profile is a dictionary of target values for the same features, meaning the
+taste we score against. Here is the primary example profile, a High-Energy Pop Lover:
 
-- Preferred `genre` and `mood`
-- Preferred `energy`, `valence`, `danceability`, `acousticness` (0 to 1) and `tempo_bpm`
-- A list of already-heard song ids to exclude from results
-- (Optional) per-feature weights controlling how much each feature matters
+```python
+user_prefs = {
+    "favorite_genre": "pop",
+    "favorite_mood": "happy",
+    "target_energy": 0.85,
+    "target_valence": 0.80,
+    "target_danceability": 0.80,
+    "target_tempo_bpm": 125,
+    "target_acousticness": 0.15,
+}
+```
+
+A profile can also carry a list of already-heard song ids to exclude from results.
 
 ### Scoring rule (one song)
 
 For each numeric feature the recommender rewards closeness, not high values, using
-`similarity = 1 - |song_value - user_preference|` (tempo is normalized by its range
-first so it can't dominate). It then adds a bonus when `genre` matches and a smaller
-bonus when `mood` matches. Genre is weighted higher because it carries information the
-numeric features don't, whereas mood is largely a summary of energy plus valence. All
-parts combine into one weighted-sum score per song.
+`similarity = 1 - |song_value - target_value|`, so a song that sits right on the
+target earns close to the full weight and a song far away earns almost nothing. Genre
+and mood are exact-match bonuses. Every component also produces a short reason string
+so each recommendation can explain itself.
+
+| Component | Rule | Max points |
+|---|---|---|
+| Genre match | `+2.5` if `song.genre == favorite_genre` | 2.5 |
+| Mood match | `+2.0` if `song.mood == favorite_mood` | 2.0 |
+| Energy similarity | `1.5 * (1 - |song.energy - target_energy|)` | 1.5 |
+| Valence similarity | `1.5 * (1 - |song.valence - target_valence|)` | 1.5 |
+| Danceability similarity | `1.0 * (1 - |song.danceability - target_danceability|)` | 1.0 |
+| Acousticness similarity | `1.0 * (1 - |song.acousticness - target_acousticness|)` | 1.0 |
+| Tempo similarity | `1.0 * (1 - |song.tempo_bpm - target_tempo_bpm| / 100)` | 1.0 |
+
+The maximum possible score is 10.5. Tempo is divided by 100 (about the 60 to 160 BPM
+spread of the catalog) so a large BPM gap cannot swamp the 0 to 1 features, and the
+tempo term is clamped at 0 so it never goes negative.
+
+This weighting is a deliberate, mood-forward design choice. Genre is the largest single
+term, but mood (2.0) plus valence (up to 1.5) gives the emotional axis a combined weight
+of 3.5, which outweighs a genre match. That mirrors how many listeners actually build
+playlists: they pick sad or happy first and genre second.
 
 ### Ranking rule (the list)
 
-The `Recommender` scores every song, drops any already in the user's heard list, sorts
-by score (highest first), and returns the top N. Scoring judges a single song; ranking
-turns those scores into an actual ordered recommendation list.
+The recommender scores every song with the rule above, drops any already in the
+user's heard list, sorts by score from highest to lowest, and returns the top K.
+Scoring judges a single song; ranking runs the whole competition.
 
 ```
-UserProfile ──┐
-              ├─► score each Song (1 - distance, + genre/mood bonus)
-Song catalog ─┘        │
-                       ▼
-              rank by score -> drop heard -> take top N -> recommendations
+user_prefs ──┐
+             ├─► score each song (genre + mood bonus + numeric closeness)
+songs.csv ───┘        │
+                      ▼
+             sort by score (high to low) -> drop heard -> take top K
 ```
+
+### Biases I expect
+
+- Because the emotional axis outweighs genre by design, the system may underrate a
+  strong genre-match song when its mood label is slightly off, even if the listener
+  would still enjoy it.
+- Mood and valence measure almost the same thing, so a happy song can be rewarded
+  twice for one underlying trait, which can crowd out otherwise good matches.
+- With a small 20-song catalog, a few dominant genres or moods can pull most profiles
+  toward the same handful of songs.
 
 ---
 
