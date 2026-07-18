@@ -184,11 +184,41 @@ Top recommendations:
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+### Multi-profile stress test
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+Running `python -m src.main` scores all 20 songs against four distinct profiles: a
+High-Energy Pop Lover, a Chill Lofi Listener, a Deep Intense Rock Fan, and a
+deliberately conflicting edge case (high energy but a sad mood). The top 5 for each:
+
+```
+=== High-Energy Pop Lover ===
+1. Sunrise City by Neon Echo  [pop / happy]        Score: 10.29
+2. Gym Hero by Max Pulse  [pop / intense]          Score: 8.09
+3. Rooftop Lights by Indigo Parade  [indie pop / happy]  Score: 7.62
+4. Bass Cathedral by Deep Sector  [house / energetic]    Score: 5.54
+5. Neon Pulse by Voltage  [edm / energetic]        Score: 5.48
+
+=== Chill Lofi Listener ===
+1. Library Rain by Paper Lanterns  [lofi / chill]  Score: 10.30
+2. Midnight Coding by LoRoom  [lofi / chill]       Score: 10.19
+3. Focus Flow by LoRoom  [lofi / focused]          Score: 8.24
+4. Spacewalk Thoughts by Orbit Bloom  [ambient / chill]  Score: 7.33
+5. Autumn Letters by The Hollow Pines  [indie folk / melancholic]  Score: 5.54
+
+=== Deep Intense Rock Fan ===
+1. Storm Runner by Voltline  [rock / intense]      Score: 10.36
+2. Gym Hero by Max Pulse  [pop / intense]          Score: 6.96
+3. Iron Verdict by Ashfall  [metal / angry]        Score: 5.47
+4. Night Drive Loop by Neon Echo  [synthwave / moody]    Score: 5.06
+5. Bass Cathedral by Deep Sector  [house / energetic]    Score: 5.05
+
+=== Conflicted High-Energy Sad (edge case) ===
+1. Neon Pulse by Voltage  [edm / energetic]        Score: 7.47
+2. Paper Boats by Ellie Frost  [folk / sad]        Score: 5.28
+3. Storm Runner by Voltline  [rock / intense]      Score: 5.18
+4. Iron Verdict by Ashfall  [metal / angry]        Score: 5.12
+5. Bass Cathedral by Deep Sector  [house / energetic]    Score: 5.10
+```
 
 ---
 
