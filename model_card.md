@@ -75,18 +75,39 @@ their stated preferences.
 
 ---
 
-## 7. Evaluation  
+## 7. Evaluation
 
-How you checked whether the recommender behaved as expected. 
+I tested four profiles: a High-Energy Pop Lover, a Chill Lofi Listener, a Deep Intense
+Rock Fan, and a deliberately conflicting edge case that wanted high energy but a sad
+mood. For each one I looked at the top five songs and asked whether a real person with
+that taste would actually want them, and whether each list was clearly different from
+the others.
 
-Prompts:  
+What surprised me most was the conflicting profile. Because it asked for two things that
+do not go together in this catalog, its list split down the middle: an energetic EDM
+song took first place to satisfy the "high energy" wish, while a quiet, sad folk song
+came second to satisfy the "sad" wish, and no single song could do both. The three
+normal profiles behaved as expected, each getting a number one that matched both its
+genre and its mood.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
+Comparing the profiles:
 
-No need for numeric metrics unless you created some.
+- **Pop Lover vs Lofi Listener:** these are near opposites, so they share no songs. The
+  pop fan gets loud, upbeat, danceable tracks and the lofi fan gets quiet, calm,
+  acoustic ones. This is the system working as intended.
+- **Pop Lover vs Rock Fan:** both want high energy but split on mood, and this is the
+  one worth explaining simply. The workout song "Gym Hero" shows up high for the happy
+  pop fan, which feels odd because it is an intense gym track, not a cheerful one. It
+  ranks high only because it shares the "pop" label and has the right energy, so the
+  matching genre pulls it up even though its mood is wrong. The rock fan also gets Gym
+  Hero, but for the opposite and correct reason: that fan actually wants the intense
+  mood.
+- **Lofi Listener vs Rock Fan:** the most extreme opposites, calm and acoustic versus
+  loud and aggressive, and their lists have essentially nothing in common, which
+  confirms the scoring separates very different tastes cleanly.
+- **Edge case vs the normal profiles:** unlike the three coherent profiles, the
+  conflicting profile never gets a satisfying number one, which shows the limit of
+  asking the system for two contradictory things at once.
 
 ---
 
