@@ -220,6 +220,16 @@ deliberately conflicting edge case (high energy but a sad mood). The top 5 for e
 5. Bass Cathedral by Deep Sector  [house / energetic]    Score: 5.10
 ```
 
+### Weight-shift experiment (energy x2, genre /2)
+
+I temporarily set the energy weight to 3.0 and the genre bonus to 1.25, then reverted.
+The clearest effect was on the High-Energy Pop Lover: Gym Hero (pop but "intense")
+fell out of the top 2 and Rooftop Lights (happy, right energy, but indie pop) rose to
+second. Profiles whose top songs already match on every feature, like the Chill Lofi
+Listener, barely moved. The shift was mostly just different, with a small accuracy gain
+on the pop list, but it weakens the deliberate mood-and-genre weighting, so the
+finalized weights are kept.
+
 ---
 
 ## Limitations and Risks
