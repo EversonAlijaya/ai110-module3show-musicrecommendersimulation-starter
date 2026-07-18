@@ -59,16 +59,19 @@ Prompts:
 
 ---
 
-## 6. Limitations and Bias 
+## 6. Limitations and Bias
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+The clearest weakness I found is that the recommender has no sense of variety, so it
+tends to build a filter bubble. Because every point rewards closeness to what the user
+already asked for, the top of each list is just more of the same, and it can even
+repeat the same artist: the Chill Lofi Listener's top three included two different
+songs by LoRoom. The small 20-song catalog makes this worse, since niche genres like
+jazz, classical, and country have only one matching track each, so listeners with those
+tastes get thin, lower-scoring results while lofi (three songs) is comparatively well
+served. A few generically high-energy songs, such as Bass Cathedral, also resurface
+across very different profiles, which is a mild popularity-style bias. The system never
+offers a surprising or diverse pick, so a user could not discover anything new outside
+their stated preferences.
 
 ---
 
