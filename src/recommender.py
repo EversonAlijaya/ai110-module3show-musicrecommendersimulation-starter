@@ -89,7 +89,7 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
             similarity = max(0.0, 1 - abs(song[song_key] - target))
             points = weight * similarity
             score += points
-            reasons.append(f"{song_key} similarity: +{points:.2f}")
+            reasons.append(f"{song_key} +{points:.2f}")
 
     # Tempo closeness, normalized by 100 BPM so it cannot swamp the other features.
     target_tempo = user_prefs.get("target_tempo_bpm")
@@ -97,7 +97,7 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
         similarity = max(0.0, 1 - abs(song["tempo_bpm"] - target_tempo) / 100)
         points = 1.0 * similarity
         score += points
-        reasons.append(f"tempo similarity: +{points:.2f}")
+        reasons.append(f"tempo +{points:.2f}")
 
     return score, reasons
 

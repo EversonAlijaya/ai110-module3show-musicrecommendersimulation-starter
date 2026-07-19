@@ -9,7 +9,13 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
+import textwrap
+
 from .recommender import load_songs, recommend_songs
+
+# Column headers and widths for the results table.
+TABLE_HEADERS = ["Rank", "Song", "Artist", "Genre / Mood", "Score", "Why"]
+TABLE_WIDTHS = [4, 18, 12, 14, 5, 38]
 
 
 # Distinct taste profiles used to stress-test the recommender.
@@ -54,14 +60,45 @@ PROFILES = {
 }
 
 
+def format_row(cells: list, widths: list) -> str:
+    """Render one table row, wrapping any cell that is too long onto extra lines."""
+    wrapped = [textwrap.wrap(str(cell), width) or [""] for cell, width in zip(cells, widths)]
+    height = max(len(lines) for lines in wrapped)
+    out = []
+    for line_index in range(height):
+        parts = []
+        for lines, width in zip(wrapped, widths):
+            text = lines[line_index] if line_index < len(lines) else ""
+            parts.append(" " + text.ljust(width) + " ")
+        out.append("|" + "|".join(parts) + "|")
+    return "\n".join(out)
+
+
+def render_table(headers: list, rows: list, widths: list) -> str:
+    """Render a bordered ASCII table with wrapped cells."""
+    separator = "+" + "+".join("-" * (width + 2) for width in widths) + "+"
+    lines = [separator, format_row(headers, widths), separator]
+    for row in rows:
+        lines.append(format_row(row, widths))
+        lines.append(separator)
+    return "\n".join(lines)
+
+
 def print_recommendations(name: str, user_prefs: dict, songs: list, k: int = 5) -> None:
-    """Print the top k recommendations for one named profile."""
+    """Print the top k recommendations for one named profile as a formatted table."""
     print(f"\n=== {name} ===")
     recommendations = recommend_songs(user_prefs, songs, k=k)
+    rows = []
     for rank, (song, score, explanation) in enumerate(recommendations, start=1):
-        print(f"{rank}. {song['title']} by {song['artist']}  [{song['genre']} / {song['mood']}]")
-        print(f"   Score: {score:.2f}")
-        print(f"   Reasons: {explanation}")
+        rows.append([
+            rank,
+            song["title"],
+            song["artist"],
+            f"{song['genre']} / {song['mood']}",
+            f"{score:.2f}",
+            explanation,
+        ])
+    print(render_table(TABLE_HEADERS, rows, TABLE_WIDTHS))
     print()
 
 
