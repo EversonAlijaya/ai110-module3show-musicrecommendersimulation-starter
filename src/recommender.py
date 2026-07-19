@@ -101,15 +101,44 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
 
     return score, reasons
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
-    """Score every song, drop already-heard ones, and return the top k as (song, score, explanation)."""
+ARTIST_PENALTY = 1.0
+
+
+def recommend_songs(
+    user_prefs: Dict,
+    songs: List[Dict],
+    k: int = 5,
+    artist_penalty: float = ARTIST_PENALTY,
+) -> List[Tuple[Dict, float, str]]:
+    """Score songs, then pick the top k one at a time, penalizing artists already chosen."""
     heard = set(user_prefs.get("heard_ids", []))
-    scored: List[Tuple[Dict, float, str]] = []
+    remaining: List[Tuple[Dict, float, List[str]]] = []
     for song in songs:
         if song["id"] in heard:
             continue
         score, reasons = score_song(user_prefs, song)
-        explanation = ", ".join(reasons)
-        scored.append((song, score, explanation))
-    ranked = sorted(scored, key=lambda item: item[1], reverse=True)
-    return ranked[:k]
+        remaining.append((song, score, reasons))
+    remaining.sort(key=lambda item: item[1], reverse=True)
+
+    chosen: List[Tuple[Dict, float, str]] = []
+    artist_counts: Dict[str, int] = {}
+    while remaining and len(chosen) < k:
+        # Pick whichever song ranks highest once the repeat-artist penalty is applied.
+        best_index = 0
+        best_adjusted = None
+        for index, (song, score, _) in enumerate(remaining):
+            adjusted = score - artist_penalty * artist_counts.get(song["artist"], 0)
+            if best_adjusted is None or adjusted > best_adjusted:
+                best_adjusted = adjusted
+                best_index = index
+
+        song, score, reasons = remaining.pop(best_index)
+        repeats = artist_counts.get(song["artist"], 0)
+        penalty = artist_penalty * repeats
+        final_reasons = list(reasons)
+        if penalty:
+            final_reasons.append(f"repeat artist penalty: -{penalty:.2f}")
+        artist_counts[song["artist"]] = repeats + 1
+        chosen.append((song, score - penalty, ", ".join(final_reasons)))
+
+    return chosen

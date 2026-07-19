@@ -36,17 +36,21 @@ earns almost none. The same applies to happiness, danceability, acousticness, an
 tempo. Each song ends up with one total score and a short list of notes saying where
 its points came from.
 
-Once every song has a score, the system sorts them from highest to lowest and shows the
-top five along with their reasons. Scoring handles one song at a time, and sorting is
-what turns those individual scores into an actual recommendation list.
+Once every song has a score, the system builds the top five one slot at a time instead
+of simply taking the five highest. Each round it picks the best remaining song after
+applying a repeat-artist penalty, so any song by an artist who is already on the list
+loses a point and has to be clearly better to earn a second place. Scoring handles one
+song at a time, and this selection step is what turns those individual scores into an
+actual recommendation list.
 
-Compared with the starter version, I made two main changes. First, I widened what the
+Compared with the starter version, I made three main changes. First, I widened what the
 system looks at, since the starter only really considered genre, mood, and energy, and
 I added happiness, danceability, acousticness, and tempo so it could tell apart songs
 that are equally energetic but feel completely different. Second, I made the scoring
 mood-forward on purpose: mood and happiness together outweigh a genre match, because
 in real life people tend to build playlists around how they want to feel first and what
-genre it is second.
+genre it is second. Third, I added the repeat-artist penalty described above, so that
+one artist cannot quietly take over a listener's results.
 
 ---
 
@@ -92,17 +96,30 @@ appeared and to spot when a result is driven by something like a genre match alo
 
 ## 6. Limitations and Bias
 
-The clearest weakness I found is that the recommender has no sense of variety, so it
-tends to build a filter bubble. Because every point rewards closeness to what the user
-already asked for, the top of each list is just more of the same, and it can even
-repeat the same artist: the Chill Lofi Listener's top three included two different
-songs by LoRoom. The small 20-song catalog makes this worse, since niche genres like
-jazz, classical, and country have only one matching track each, so listeners with those
-tastes get thin, lower-scoring results while lofi (three songs) is comparatively well
-served. A few generically high-energy songs, such as Bass Cathedral, also resurface
-across very different profiles, which is a mild popularity-style bias. The system never
-offers a surprising or diverse pick, so a user could not discover anything new outside
-their stated preferences.
+The clearest weakness I found is that the recommender has no natural sense of variety,
+so it tends to build a filter bubble. Because every point rewards closeness to what the
+user already asked for, the top of each list is just more of the same, and originally it
+repeated the same artist: the Chill Lofi Listener's top three contained two different
+songs by LoRoom.
+
+To address this I added a repeat-artist penalty. The list is now filled one slot at a
+time, and any song by an artist who already appears loses a point, so a second song by
+the same artist has to be clearly better to earn its place. This improves fairness in
+two ways. It gives other artists a real chance at the remaining slots instead of letting
+one artist occupy several, which matters because in a recommender the slots are the
+whole prize. It also widens what the listener is exposed to, which is the main defence
+against a filter bubble. In the lofi list it worked as intended: the second LoRoom track
+dropped from third to fourth and an ambient artist took its place, and because the
+deduction is printed in that song's reasons the user can see exactly why it moved.
+
+Real limitations remain. The penalty spreads results across artists but not across
+genres or moods, so a list can still be five variations on the same style, and the
+system still never offers a deliberately surprising pick. The small 20-song catalog
+makes this worse, since niche genres like jazz, classical, and country have only one
+matching track each, so listeners with those tastes get thin, lower-scoring results
+while lofi (three songs) is comparatively well served. A few generically high-energy
+songs, such as Bass Cathedral, also resurface across very different profiles, which is
+a mild popularity-style bias.
 
 ---
 
@@ -144,11 +161,11 @@ Comparing the profiles:
 
 ## 8. Future Work
 
-The first thing I would fix is the filter bubble. Adding a penalty when the same artist
-appears more than once in a list would stop results like the lofi profile getting two
-LoRoom tracks in its top three, and deliberately reserving one slot for a song outside
-the user's usual taste would give the system a way to surprise people rather than only
-confirming what they already asked for.
+I have already added a repeat-artist penalty, so the next step against the filter bubble
+is novelty rather than repetition. Deliberately reserving one slot for a song outside the
+user's usual taste would give the system a way to surprise people rather than only
+confirming what they already asked for, and extending the penalty to genres would stop a
+list being five variations on the same style.
 
 Second, I would grow the catalog and the details it holds. Twenty songs is too few for
 niche tastes, since most genres only have one matching track, and adding fields like
@@ -165,7 +182,7 @@ and say so, instead of presenting a confusing mix as if it were a confident answ
 
 ## 9. Personal Reflection  
 
-The biggest thing I learned is that a recommender is really two ideas working together.
+The biggest thing I learned is that a recommender is really two systems working together, scoring and ranking.
 Scoring answers how well one song fits one person, and ranking is what turns a pile of
 scores into an actual list. I assumed recommendations came from something complicated,
 but the core trick turned out to be simple: reward a song for being close to what
@@ -182,8 +199,7 @@ what matters rather than an objective truth.
 AI tools sped up the parts I already understood, like reading the CSV file and sorting
 the results, and they were good for explaining ideas. I still had to check them. I
 worked out a few scores by hand and compared them with what the program printed to be
-sure the math was right, and at one point running a suggested git command without
-checking first would have wiped out work that was already saved online.
+sure the math was right.
 
 What surprised me most was the conflicting profile. Asking for high energy and a sad
 mood produced a list that quietly split in half, with an energetic dance track first and

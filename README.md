@@ -11,13 +11,13 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-My version is called VibeCheck 1.0. It is a content-based recommender that runs in the
+My version is called MoodMatch 1.0. It is a content-based recommender that runs in the
 terminal. It loads a catalog of 20 songs from a CSV file, compares each song against a
 user's taste profile (favourite genre and mood, plus target energy, valence,
 danceability, acousticness, and tempo), and scores every song by how closely it matches.
 It then ranks the songs and prints the top five with a short reason for each pick, so it
 is always clear where the points came from. The weighting is deliberately mood-forward,
-meaning mood and valence together outweigh a genre match.
+meaning mood and valence together outweighs a genre match.
 
 ---
 
@@ -96,16 +96,19 @@ playlists: they pick sad or happy first and genre second.
 
 ### Ranking rule (the list)
 
-The recommender scores every song with the rule above, drops any already in the
-user's heard list, sorts by score from highest to lowest, and returns the top K.
-Scoring judges a single song; ranking runs the whole competition.
+The recommender scores every song with the rule above, drops any already in the user's
+heard list, then fills the top K one slot at a time. Each round it picks whichever song
+ranks highest once a repeat-artist penalty is applied: every song by an artist already
+in the list loses 1.0 point. This stops a single artist taking over the results, and
+the deduction is shown in that song's reasons so it stays visible. Scoring judges a
+single song; ranking runs the whole competition.
 
 ```
 user_prefs ──┐
              ├─► score each song (genre + mood bonus + numeric closeness)
 songs.csv ───┘        │
                       ▼
-             sort by score (high to low) -> drop heard -> take top K
+      drop heard -> pick top K one at a time, applying repeat-artist penalty
 ```
 
 ### Biases I expect
@@ -207,8 +210,8 @@ deliberately conflicting edge case (high energy but a sad mood). The top 5 for e
 === Chill Lofi Listener ===
 1. Library Rain by Paper Lanterns  [lofi / chill]  Score: 10.30
 2. Midnight Coding by LoRoom  [lofi / chill]       Score: 10.19
-3. Focus Flow by LoRoom  [lofi / focused]          Score: 8.24
-4. Spacewalk Thoughts by Orbit Bloom  [ambient / chill]  Score: 7.33
+3. Spacewalk Thoughts by Orbit Bloom  [ambient / chill]  Score: 7.33
+4. Focus Flow by LoRoom  [lofi / focused]          Score: 7.24  (repeat artist penalty: -1.00)
 5. Autumn Letters by The Hollow Pines  [indie folk / melancholic]  Score: 5.54
 
 === Deep Intense Rock Fan ===
@@ -240,21 +243,13 @@ finalized weights are kept.
 
 ## Limitations and Risks
 
-- The catalog is tiny at 20 songs, and most genres have only one track, so a listener
-  with a niche taste gets thin results while lofi (three tracks) is comparatively well
-  served.
-- It only rewards similarity to what the user already asked for, so it builds a filter
-  bubble and can repeat the same artist. The Chill Lofi profile got two LoRoom songs in
-  its top three.
-- It does not understand lyrics, language, artist popularity, release era, or what a
-  song personally means to someone.
-- Conflicting preferences are handled poorly. Asking for high energy and a sad mood
-  splits the list between songs that satisfy one wish or the other, without flagging
-  that no song satisfies both.
-- The weights are my own judgement call rather than an objective truth, so the results
-  reflect what I decided to prioritise.
+- The catalog is tiny at 20 songs, and most genres have only one track, so a listener  with a niche taste gets thin results while lofi (three tracks) is comparatively well served.
+- It only rewards similarity to what the user already asked for, so it builds a filter bubble and can repeat the same artist. The Chill Lofi profile got two LoRoom songs in its top three.
+- It does not understand lyrics, language, artist popularity, release era, or a song's meaning
+- Conflicting preferences are handled poorly. Asking for high energy and a sad mood splits the list between songs that satisfy one wish or the other, without flagging that no song satisfies both.
+- The weights are my own judgement call rather than an objective truth, so the results reflect what I decided to prioritise.
 
-There is a fuller discussion in the [Model Card](model_card.md).
+There is a fuller discussion in the model card
 
 ---
 
