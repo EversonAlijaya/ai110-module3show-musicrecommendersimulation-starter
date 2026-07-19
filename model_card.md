@@ -1,61 +1,92 @@
 # 🎧 Model Card: Music Recommender Simulation
 
-## 1. Model Name  
+## 1. Model Name
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
-
----
-
-## 2. Intended Use  
-
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+**VibeCheck 1.0**
 
 ---
 
-## 3. How the Model Works  
+## 2. Intended Use
 
-Explain your scoring approach in simple language.  
+VibeCheck 1.0 takes a description of someone's music taste and suggests songs from a
+small catalog that fit that taste, with a short reason for every pick. It assumes the
+user can describe what they want up front, meaning a favourite genre and mood plus
+roughly how energetic, upbeat, danceable, acoustic, and fast they like their music. It
+also assumes those stated preferences are honest and stable, since it has no listening
+history to learn from.
 
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
-
----
-
-## 4. Data  
-
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+This is a classroom exploration project, not a product. It runs in a terminal on 20
+hand-written songs and is meant to make the mechanics of a recommender visible, so it
+should not be used to make real recommendations to real listeners.
 
 ---
 
-## 5. Strengths  
+## 3. How the Model Works
 
-Where does your system seem to work well  
+The user describes their taste: a favourite genre and mood, plus their ideal energy,
+happiness, danceability, acousticness, and tempo. Every song in the catalog carries
+those same details.
 
-Prompts:  
+The system goes through the songs one at a time and gives each one a score. A song
+gets a fixed number of points if its genre is the one the user asked for, and a further
+fixed number if its mood matches. For the numeric traits, points are awarded for being
+close to what the user wants rather than for being high. A song whose energy sits right
+on the user's ideal earns almost all the available energy points, and a song far away
+earns almost none. The same applies to happiness, danceability, acousticness, and
+tempo. Each song ends up with one total score and a short list of notes saying where
+its points came from.
 
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+Once every song has a score, the system sorts them from highest to lowest and shows the
+top five along with their reasons. Scoring handles one song at a time, and sorting is
+what turns those individual scores into an actual recommendation list.
+
+Compared with the starter version, I made two main changes. First, I widened what the
+system looks at, since the starter only really considered genre, mood, and energy, and
+I added happiness, danceability, acousticness, and tempo so it could tell apart songs
+that are equally energetic but feel completely different. Second, I made the scoring
+mood-forward on purpose: mood and happiness together outweigh a genre match, because
+in real life people tend to build playlists around how they want to feel first and what
+genre it is second.
+
+---
+
+## 4. Data
+
+The catalog holds 20 songs written by hand for this project, covering 17 genres and 13
+moods. The genres range from pop, rock, and lofi through hip-hop, EDM, house, and metal
+to classical, jazz, folk, country, reggae, and R&B, and the moods run from happy, chill,
+and energetic to sad, angry, melancholic, and nostalgic. Each song lists a title, an
+artist, a genre, a mood, and five numeric traits: energy, happiness, danceability,
+acousticness, and tempo.
+
+I started from a 10-song starter file and added 10 more, deliberately choosing genres
+and moods that were missing so that very different listeners would each have something
+to match. I did not remove anything.
+
+Plenty of real musical taste is missing. There are no lyrics, no language or cultural
+context, no release year, no popularity, and no sense of what a song means to someone
+personally. Most genres are represented by only one song, so a listener with a niche
+taste has very little to be matched against.
+
+---
+
+## 5. Strengths
+
+The system works best for listeners who can state a clear, internally consistent taste.
+Each of the three coherent profiles I tested got a sensible number one pick that matched
+both its genre and its mood, and the three lists barely overlapped, which is what you
+want from a recommender that is genuinely responding to different people.
+
+The scoring captures the idea of a "vibe" better than energy alone would. Energy tells
+you how calm or intense a song is, and happiness tells you whether that intensity is
+cheerful or dark, so the system can correctly separate an upbeat workout track from an
+aggressive rock track even though both are high energy.
+
+It also reaches across genre boundaries in a way that matched my intuition. A happy
+indie pop song ranked highly for the pop listener without being pop, and an intense pop
+song ranked second for the rock listener, both because the mood lined up. Finally,
+every recommendation explains itself, so it is always possible to see exactly why a song
+appeared and to spot when a result is driven by something like a genre match alone.
 
 ---
 
@@ -111,16 +142,24 @@ Comparing the profiles:
 
 ---
 
-## 8. Future Work  
+## 8. Future Work
 
-Ideas for how you would improve the model next.  
+The first thing I would fix is the filter bubble. Adding a penalty when the same artist
+appears more than once in a list would stop results like the lofi profile getting two
+LoRoom tracks in its top three, and deliberately reserving one slot for a song outside
+the user's usual taste would give the system a way to surprise people rather than only
+confirming what they already asked for.
 
-Prompts:  
+Second, I would grow the catalog and the details it holds. Twenty songs is too few for
+niche tastes, since most genres only have one matching track, and adding fields like
+release decade, popularity, and more specific mood tags would let the system reflect
+things people genuinely care about, such as preferring older music or avoiding
+overplayed hits.
 
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+Third, I would handle conflicting tastes more honestly. Right now a request for high
+energy and a sad mood quietly splits the list between songs that satisfy one wish or
+the other, and it would be better for the system to notice that no song satisfies both
+and say so, instead of presenting a confusing mix as if it were a confident answer.
 
 ---
 
