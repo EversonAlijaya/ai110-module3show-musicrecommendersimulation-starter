@@ -2,13 +2,13 @@
 
 ## 1. Model Name
 
-**VibeCheck 1.0**
+**MoodMatch 1.0**
 
 ---
 
 ## 2. Intended Use
 
-VibeCheck 1.0 takes a description of someone's music taste and suggests songs from a
+MoodMatch 1.0 takes a description of someone's music taste and suggests songs from a
 small catalog that fit that taste, with a short reason for every pick. It assumes the
 user can describe what they want up front, meaning a favourite genre and mood plus
 roughly how energetic, upbeat, danceable, acoustic, and fast they like their music. It
@@ -165,10 +165,31 @@ and say so, instead of presenting a confusing mix as if it were a confident answ
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
+The biggest thing I learned is that a recommender is really two ideas working together.
+Scoring answers how well one song fits one person, and ranking is what turns a pile of
+scores into an actual list. I assumed recommendations came from something complicated,
+but the core trick turned out to be simple: reward a song for being close to what
+someone wants instead of for having a high value, because always picking the most
+energetic song is not the same as picking the right one.
 
-Prompts:  
+The most useful moment was deciding the weights myself. The AI suggested making genre
+the strongest signal, but that did not match how I actually listen, since I build
+playlists around whether I want something sad or happy long before I think about genre.
+Changing the weights so mood and happiness together outweigh genre made the results feel
+much more like mine, and it taught me that these systems encode somebody's opinion about
+what matters rather than an objective truth.
 
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+AI tools sped up the parts I already understood, like reading the CSV file and sorting
+the results, and they were good for explaining ideas. I still had to check them. I
+worked out a few scores by hand and compared them with what the program printed to be
+sure the math was right, and at one point running a suggested git command without
+checking first would have wiped out work that was already saved online.
+
+What surprised me most was the conflicting profile. Asking for high energy and a sad
+mood produced a list that quietly split in half, with an energetic dance track first and
+a slow sad song second, and neither one actually satisfied the request. It looked
+confident even though it had failed. That changed how I think about music apps: when a
+recommendation feels wrong, it is probably not broken, it is just optimising for
+something slightly different from what I meant. If I kept going, I would add a rule to
+stop the same artist repeating and to slip in one unexpected song, so it could help me
+discover things instead of only echoing what I already asked for.

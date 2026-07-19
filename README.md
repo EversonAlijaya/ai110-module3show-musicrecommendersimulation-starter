@@ -11,7 +11,13 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+My version is called VibeCheck 1.0. It is a content-based recommender that runs in the
+terminal. It loads a catalog of 20 songs from a CSV file, compares each song against a
+user's taste profile (favourite genre and mood, plus target energy, valence,
+danceability, acousticness, and tempo), and scores every song by how closely it matches.
+It then ranks the songs and prints the top five with a short reason for each pick, so it
+is always clear where the points came from. The weighting is deliberately mood-forward,
+meaning mood and valence together outweigh a genre match.
 
 ---
 
@@ -234,15 +240,21 @@ finalized weights are kept.
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+- The catalog is tiny at 20 songs, and most genres have only one track, so a listener
+  with a niche taste gets thin results while lofi (three tracks) is comparatively well
+  served.
+- It only rewards similarity to what the user already asked for, so it builds a filter
+  bubble and can repeat the same artist. The Chill Lofi profile got two LoRoom songs in
+  its top three.
+- It does not understand lyrics, language, artist popularity, release era, or what a
+  song personally means to someone.
+- Conflicting preferences are handled poorly. Asking for high energy and a sad mood
+  splits the list between songs that satisfy one wish or the other, without flagging
+  that no song satisfies both.
+- The weights are my own judgement call rather than an objective truth, so the results
+  reflect what I decided to prioritise.
 
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+There is a fuller discussion in the [Model Card](model_card.md).
 
 ---
 
@@ -252,10 +264,23 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
+Building this made it concrete how a recommender turns data into a prediction. A song is
+just a row of labels and numbers, and a taste profile is the same shape, so a prediction
+is nothing more than comparing the two field by field, awarding points for how closely
+they line up, adding those points into one number, and sorting. The interesting part is
+that the weights are a judgement call, not a fact. When I made mood and happiness
+outweigh genre, the recommendations changed noticeably, which means the "right" answer
+the system produces is really a reflection of what its designer cares about, in my case it was mood rather than genre.
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+Bias shows up in more places than I expected. The catalog itself decides who gets served
+well, and because lofi has three songs while jazz and classical have one each, a lofi
+listener gets a rich list and a jazz listener gets a thin one purely because of what I
+happened to include. The scoring only ever rewards similarity to what the user already
+asked for, so it creates a filter bubble and can repeat the same artist without noticing,
+and it never offers anything new. A few middle-of-the-road high-energy songs also kept
+resurfacing across very different profiles, which is a small version of the popularity
+bias that real platforms have, where songs that already get recommended collect more
+data and end up getting recommended even more.
 
 
 
