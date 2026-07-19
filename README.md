@@ -79,11 +79,11 @@ so each recommendation can explain itself.
 |---|---|---|
 | Genre match | `+2.5` if `song.genre == favorite_genre` | 2.5 |
 | Mood match | `+2.0` if `song.mood == favorite_mood` | 2.0 |
-| Energy similarity | `1.5 * (1 - |song.energy - target_energy|)` | 1.5 |
-| Valence similarity | `1.5 * (1 - |song.valence - target_valence|)` | 1.5 |
-| Danceability similarity | `1.0 * (1 - |song.danceability - target_danceability|)` | 1.0 |
-| Acousticness similarity | `1.0 * (1 - |song.acousticness - target_acousticness|)` | 1.0 |
-| Tempo similarity | `1.0 * (1 - |song.tempo_bpm - target_tempo_bpm| / 100)` | 1.0 |
+| Energy similarity | `1.5 * (1 - song.energy - target_energy)` | 1.5 |
+| Valence similarity | `1.5 * (1 - song.valence - target_valence)` | 1.5 |
+| Danceability similarity | `1.0 * (1 - song.danceability - target_danceability)` | 1.0 |
+| Acousticness similarity | `1.0 * (1 - song.acousticness - target_acousticness)` | 1.0 |
+| Tempo similarity | `1.0 * (1 - song.tempo_bpm - target_tempo_bpm / 100)` | 1.0 |
 
 The maximum possible score is 10.5. Tempo is divided by 100 (about the 60 to 160 BPM
 spread of the catalog) so a large BPM gap cannot swamp the 0 to 1 features, and the
